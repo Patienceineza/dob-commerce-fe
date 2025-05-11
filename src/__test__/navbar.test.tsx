@@ -10,6 +10,7 @@ import signInReducer from '@/features/Auth/SignInSlice';
 import cartReducer from '@/features/Cart/cartSlice';
 
 const createTestStore = () =>
+
   configureStore({
     reducer: { signIn: signInReducer, cartItems: cartReducer },
   });
@@ -55,11 +56,11 @@ describe('Navbar Component', () => {
     const loginBtn = screen.getByText('Login');
     expect(loginBtn).toBeInTheDocument();
 
-    // const avatar = screen.getByAltText(/profile/i);
-    // expect(avatar).toBeInTheDocument();
+    const avatar = screen.getByAltText(/profile/i);
+    expect(avatar).toBeInTheDocument();
 
-    // const username = screen.getByText(/amanda green/i);
-    // expect(username).toBeInTheDocument();
+    const username = screen.getByText(/amanda green/i);
+    expect(username).toBeInTheDocument();
   });
 
   it('highlights the correct navigation link based on the current route', () => {

@@ -3,28 +3,32 @@ import { IoIosArrowForward } from 'react-icons/io';
 import ProductCard from './ProductCard';
 import { RootState } from '@/app/store';
 import { Product } from '@/types/Product';
-import { useAppSelector } from '@/app/hooks';
-import { selectProducts } from '@/features/Products/ProductSlice';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
+import { selectProducts, fetchProducts } from '@/features/Products/ProductSlice';
+import { useEffect } from 'react';
 
 function FeaturedSection() {
+  const dispatch = useAppDispatch();
   const products: Product[] = useAppSelector((state: RootState) =>
     selectProducts(state)
   );
 
-  const featuredProducts = products.filter((product) => product.isFeatured);
-
-  // Get the latest 4 products
-  const latestProducts = featuredProducts.slice(0, 4);
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+  const latestProducts = [...products]
+    .sort((a, b) => b.id - a.id)
+    .slice(0, 4);
 
   return (
     <div className="w-full mx-auto mt-8 md:mt-12 px-16">
       <div className="flex flex-row justify-between items-center mb-6">
         <div className="flex flex-col lg:flex-row gap-2 md:gap-2 lg:gap-6 w-full md:w-3/4 items-center">
           <h2 className="text-3xl font-semibold text-black w-full lg:w-auto text-center md:text-left">
-            Featured Products
+            New Arrivals
           </h2>
           <p className="text-sm font-light text-black w-full lg:w-auto text-center md:text-left">
-            Dont miss this opportunity at a special discount just for this week.
+            Check out our latest products just added to our collection.
           </p>
         </div>
         <Link

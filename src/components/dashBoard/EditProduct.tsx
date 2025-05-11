@@ -19,7 +19,7 @@ interface UpdateProduct {
   longDesc: string;
   categoryId: number;
   quantity: number;
-  regularPrice: number;
+  regularPrice: number; 
   salesPrice: number;
   tags: string[];
   type: string;

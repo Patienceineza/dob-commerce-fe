@@ -1,7 +1,6 @@
-import axios, { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { FaHeart, FaRegHeart, FaStar } from 'react-icons/fa';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { IoClose } from 'react-icons/io5';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -12,9 +11,10 @@ import {
   addToWishlist,
   fetchProductDetails,
   removeFromWishlist,
+  submitReview,
 } from '@/features/Products/ProductSlice';
 import { Product } from '@/types/Product';
-import { showErrorToast, showSuccessToast } from '@/utils/ToastConfig';
+import { showSuccessToast } from '@/utils/ToastConfig';
 import { fetchBestSellingProducts } from '@/features/Popular/bestSellingProductSlice';
 
 interface IProduct extends Product {
@@ -153,20 +153,18 @@ function ProductDetails() {
   const dispatch = useAppDispatch();
   const { id } = useParams();
   const [newReview, setNewReview] = useState(false);
-  const [review, setReview] = useState<{
+  const [reviewForm, setReviewForm] = useState<{
     rating: number | null;
     content: string;
     productId: number | undefined;
   }>({ rating: null, content: '', productId: product?.id });
-  const [error, setError] = useState('');
-  const [reviewLoading, setReviewLoading] = useState(false);
   const [toggleLoginOverlay, setToggleLoginOverlay] = useState(false);
   const [isVisible, setIsVisible] = useState({ state: true, name: 'details' });
   const [activeImg, setActiveImg] = useState('');
   const [cartId, setCartId] = useState<number | null>(null);
-  const wishlistProducts = useAppSelector(
-    (state) => state.products.wishlistProducts
-  );
+  const { wishlistProducts } = useAppSelector((state) => state.products);
+  const user = useAppSelector((state) => state.signIn.user);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setActiveImg(product?.image || '');
@@ -192,51 +190,7 @@ function ProductDetails() {
     return wishlistProds?.some((wishlistProd) => wishlistProd.id === prod.id);
   };
 
-  const submitReview = async () => {
-    if (!token) {
-      setToggleLoginOverlay(true);
-      return;
-    }
-
-    if (!review.rating) {
-      setError('Rating is required');
-      return;
-    }
-
-    if (!review.content) {
-      setError('Content is required');
-      return;
-    }
-
-    setReviewLoading(true);
-
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/review`,
-        review,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setNewReview(true);
-      setError('');
-      setReviewLoading(false);
-      showSuccessToast(response.data.message as string);
-    } catch (err) {
-      const errorObj = err as AxiosError;
-      setError('');
-      setReviewLoading(false);
-      if (!errorObj.response) {
-        showErrorToast('An error occured');
-        return;
-      }
-      showErrorToast((errorObj.response.data as { message: string }).message);
-    }
-  };
-  function handleAddtoCart(e: React.MouseEvent<HTMLButtonElement>) {
+  const handleAddtoCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     const element = e.target as HTMLElement;
     const [, message, action] =
       element.textContent === 'Remove from Cart'
@@ -254,7 +208,18 @@ function ProductDetails() {
       setCartId((res.payload as Cart).id || null);
       showSuccessToast(message);
     });
-  }
+  };
+
+  const handleCheckout = () => {
+    // First add to cart if not already in cart
+    if (!cartId) {
+      dispatch(addCartItem({ productId: product!.id, quantity: 1 })).then(() => {
+        navigate('/checkout');
+      });
+    } else {
+      navigate('/checkout');
+    }
+  };
 
   return (
     <div className="relative flex flex-col items-center w-full xs:min-h-[35rem] lg:min-h-80 p-8">
@@ -465,29 +430,33 @@ function ProductDetails() {
               >
                 Add to Cart
               </button>
-              <Button title="Checkout" styles="w-40" />
+              <Button title="Checkout" styles="w-40" onClick={handleCheckout} />
             </div>
             <div className="flex items-center gap-4 w-full">
-              {isInWishlist(product, wishlistProducts) ? (
-                <FaHeart
-                  color="#6D31ED"
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    dispatch(removeFromWishlist({ id: product.id, token }))
-                  }
-                />
-              ) : (
-                <FaRegHeart
-                  color="#9CA3AF"
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    dispatch(addToWishlist({ token, id: product.id }))
-                  }
-                />
+              {user?.userType.name !== 'Vendor' && (
+                <>
+                  {isInWishlist(product, wishlistProducts) ? (
+                    <FaHeart
+                      color="#6D31ED"
+                      size={20}
+                      className="cursor-pointer"
+                      onClick={() =>
+                        dispatch(removeFromWishlist({ id: product.id, token }))
+                      }
+                    />
+                  ) : (
+                    <FaRegHeart
+                      color="#9CA3AF"
+                      size={20}
+                      className="cursor-pointer"
+                      onClick={() =>
+                        dispatch(addToWishlist({ token, id: product.id }))
+                      }
+                    />
+                  )}
+                  <h2>Add to wishlist</h2>
+                </>
               )}
-              <h2>Add to wishlist</h2>
             </div>
             <div className="flex items-center">
               <span className="text-grey mr-2">Tags:</span>
@@ -575,6 +544,71 @@ function ProductDetails() {
           )}
           {isVisible.state && isVisible.name === 'reviews' && (
             <div className="flex flex-col gap-6 xs:w-full lg:w-4/5 pt-4">
+              {token && (
+                <div className="flex flex-col gap-4 w-full p-4 border border-gray-200 rounded-lg mb-6">
+                  <h2 className="font-semibold text-lg">Write a Review</h2>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600">Rating:</span>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                          className="focus:outline-none"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-6 w-6 ${
+                              reviewForm.rating && star <= reviewForm.rating
+                                ? 'text-yellow-400'
+                                : 'text-gray-300'
+                            }`}
+                            viewBox="0 0 36 36"
+                          >
+                            <path
+                              fill="currentColor"
+                              d="M27.287 34.627c-.404 0-.806-.124-1.152-.371L18 28.422l-8.135 5.834a1.97 1.97 0 0 1-2.312-.008a1.971 1.971 0 0 1-.721-2.194l3.034-9.792l-8.062-5.681a1.98 1.98 0 0 1-.708-2.203a1.978 1.978 0 0 1 1.866-1.363L12.947 13l3.179-9.549a1.976 1.976 0 0 1 3.749 0L23 13l10.036.015a1.975 1.975 0 0 1 1.159 3.566l-8.062 5.681l3.034 9.792a1.97 1.97 0 0 1-.72 2.194a1.957 1.957 0 0 1-1.16.379"
+                            />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <textarea
+                    value={reviewForm.content}
+                    onChange={(e) => setReviewForm({ ...reviewForm, content: e.target.value })}
+                    placeholder="Write your review here..."
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    rows={4}
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!reviewForm.rating || !reviewForm.content) {
+                        showSuccessToast('Please provide both rating and review content');
+                        return;
+                      }
+                      try {
+                        await dispatch(submitReview({
+                          content: reviewForm.content,
+                          rating: reviewForm.rating,
+                          productId: product!.id,
+                          token,
+                        })).unwrap();
+                        showSuccessToast('Review submitted successfully!');
+                        setReviewForm({ rating: null, content: '', productId: product?.id });
+                        setNewReview(prev => !prev);
+                      } catch (error) {
+                        showSuccessToast(error as string);
+                      }
+                    }}
+                    className="self-end px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                  >
+                    Submit Review
+                  </button>
+                </div>
+              )}
               {product?.reviews.length === 0 && (
                 <div className="text-grey font-medium">No reviews found</div>
               )}
@@ -598,68 +632,11 @@ function ProductDetails() {
                           <span className="">{productReview.rating}</span>
                           {Array.from({
                             length: Math.floor(productReview.rating),
-                          }).map((_, index) => {
-                            return (
-                              <div data-testid="ratingStar" key={index}>
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-6 w-6 text-yellow-400"
-                                  viewBox="0 0 36 36"
-                                >
-                                  <path
-                                    fill="currentColor"
-                                    d="M27.287 34.627c-.404 0-.806-.124-1.152-.371L18 28.422l-8.135 5.834a1.97 1.97 0 0 1-2.312-.008a1.971 1.971 0 0 1-.721-2.194l3.034-9.792l-8.062-5.681a1.98 1.98 0 0 1-.708-2.203a1.978 1.978 0 0 1 1.866-1.363L12.947 13l3.179-9.549a1.976 1.976 0 0 1 3.749 0L23 13l10.036.015a1.975 1.975 0 0 1 1.159 3.566l-8.062 5.681l3.034 9.792a1.97 1.97 0 0 1-.72 2.194a1.957 1.957 0 0 1-1.16.379"
-                                  />
-                                </svg>
-                              </div>
-                            );
-                          })}
-                          <div>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-6 w-6"
-                              viewBox="0 0 36 36"
-                              data-testid="halfStar"
-                            >
-                              <defs>
-                                <linearGradient
-                                  id="grad1"
-                                  x1="0%"
-                                  y1="0%"
-                                  x2="100%"
-                                  y2="0%"
-                                >
-                                  <stop
-                                    offset={`${(productReview.rating - Math.floor(productReview.rating)) * 100}%`}
-                                    style={{
-                                      stopColor: 'rgb(250 204 21)',
-                                      stopOpacity: 1,
-                                    }}
-                                  />
-                                  <stop
-                                    offset={`${(productReview.rating - Math.floor(productReview.rating)) * 100}%`}
-                                    style={{
-                                      stopColor: 'rgb(156 163 175)',
-                                      stopOpacity: 1,
-                                    }}
-                                  />
-                                </linearGradient>
-                              </defs>
-                              <path
-                                fill="url(#grad1)"
-                                d="M27.287 34.627c-.404 0-.806-.124-1.152-.371L18 28.422l-8.135 5.834a1.97 1.97 0 0 1-2.312-.008a1.971 1.971 0 0 1-.721-2.194l3.034-9.792l-8.062-5.681a1.98 1.98 0 0 1-.708-2.203a1.978 1.978 0 0 1 1.866-1.363L12.947 13l3.179-9.549a1.976 1.976 0 0 1 3.749 0L23 13l10.036.015a1.975 1.975 0 0 1 1.159 3.566l-8.062 5.681l3.034 9.792a1.97 1.97 0 0 1-.72 2.194a1.957 1.957 0 0 1-1.16.379"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                        {Array.from({
-                          length: Math.floor(4 - productReview.rating),
-                        }).map((_, index) => {
-                          return (
-                            <div data-testid="emptyStar" key={index}>
+                          }).map((_, index) => (
+                            <div data-testid="ratingStar" key={index}>
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6 text-gray-400"
+                                className="h-6 w-6 text-yellow-400"
                                 viewBox="0 0 36 36"
                               >
                                 <path
@@ -668,8 +645,8 @@ function ProductDetails() {
                                 />
                               </svg>
                             </div>
-                          );
-                        })}
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -678,54 +655,6 @@ function ProductDetails() {
               ))}
             </div>
           )}
-        </div>
-      )}
-      {!productDetailsLoading && product && (
-        <div className="flex xs:w-full lg:w-[90%] gap-4 flex-col items-start mt-20">
-          <h1 className="text-2xl font-semibold">Add a review</h1>
-          <h2>
-            Your rating<span className="text-red-700"> *</span>
-          </h2>
-          <div className="flex items-center gap-2">
-            {Array.from({ length: 5 }, (_, i) => (
-              <FaStar
-                title="inputStar"
-                size="25"
-                color={
-                  review.rating && i + 1 <= review.rating
-                    ? '#FACC15'
-                    : '#9CA3AF'
-                }
-                key={i}
-                onClick={() =>
-                  setReview({ ...review, rating: i + 1, productId: product.id })
-                }
-              />
-            ))}
-          </div>
-          <h2>
-            Your review<span className="text-red-700"> *</span>
-          </h2>
-          <textarea
-            title="inputContent"
-            className="xs:w-full lg:w-4/5 h-40 rounded-md border-[1.5px] outline-none border-textareaBorder"
-            onChange={(e) =>
-              setReview({
-                ...review,
-                content: e.target.value,
-                productId: product.id,
-              })
-            }
-          ></textarea>
-          {error && <div className="text-sm text-red-700">{error}</div>}
-          <Button
-            title={!reviewLoading ? 'Submit' : ''}
-            icon={
-              reviewLoading ? <ClipLoader size={20} color="white" /> : undefined
-            }
-            styles="w-40"
-            onClick={submitReview}
-          />
         </div>
       )}
       {!productDetailsLoading && product && (

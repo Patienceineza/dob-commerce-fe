@@ -35,27 +35,27 @@ function MostPopular() {
     .slice(start, end);
 
   return (
-    <div className=" flex flex-col mb-6">
+    <div className="flex flex-col mb-8">
       <PopilarTitle
         section="Most Popular"
         onLeftArrowClick={handleLeftallowclick}
         onRightArrowClick={handleRightallowclick}
       />
 
-      <div className=" grid gap-y-2">
+      <div className="grid gap-3 bg-white rounded-2xl p-4 shadow-lg">
         {status === 'loading' &&
           Array(3)
             .fill(null)
-            .map(() => (
+            .map((_, index) => (
               <div
-                key={1}
-                className="border-2 px-[2px] shadow-lg animate-pulse bg-violet-50 flex flex-row justify-between items-center"
+                key={index}
+                className="flex flex-row items-center gap-4 p-3 rounded-xl bg-gray-50 animate-pulse"
                 role="status"
               >
-                <div className=" h-[50px] w-[50px] rounded border shadow-lg animate-pulse"></div>
-                <div className="flex flex-col justify-between py-2 pl-1 w-full">
-                  <div className=" border-[1.5px] shadow-md animate-pulse h-[25px] w-full"></div>
-                  <div className=" border-[1.5px] shadow-md  animate-pulse h-[20px] w-[50%]"></div>
+                <div className="h-20 w-20 rounded-lg bg-gray-200"></div>
+                <div className="flex flex-col gap-2 flex-1">
+                  <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-5 bg-gray-200 rounded w-1/3"></div>
                 </div>
               </div>
             ))}
@@ -63,12 +63,12 @@ function MostPopular() {
         {status === 'failed' &&
           Array(3)
             .fill(null)
-            .map(() => (
+            .map((_, index) => (
               <div
-                key={1}
-                className="border-2 px-[2px] h-[50px] shadow-lg animate-pulse bg-violet-50 flex flex-row justify-between items-center"
+                key={index}
+                className="flex items-center justify-center p-4 rounded-xl bg-red-50 text-red-600 font-medium"
               >
-                Loading Failed...
+                Failed to load products. Please try again.
               </div>
             ))}
 

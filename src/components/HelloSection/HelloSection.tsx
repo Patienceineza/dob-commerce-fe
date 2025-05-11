@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { FiArrowRight, FiArrowLeft } from 'react-icons/fi';
 import { HiOutlineArrowNarrowRight } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
 import img1 from '@/assets/360_F_458406888_GhaARrvDMxUEI8G0ybS7gxUQRBSEcGES.jpg';
 import img2 from '@/assets/89163136_108185537454469_8342778628777443328_n.jpg';
 import img3 from '@/assets/istockphoto-1155467348-612x612.jpg';
 
 function HeroBanner() {
+  const navigate = useNavigate();
   const slides = [
     {
       id: 1,
@@ -90,6 +92,7 @@ function HeroBanner() {
                 <div className="flex flex-wrap gap-4">
                   <button
                     type="button"
+                    onClick={() => navigate('/shop')}
                     className="bg-white text-primary hover:bg-gray-100 px-8 py-3 rounded-full font-medium flex items-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                   >
                     {slide.ctaPrimary}
@@ -97,6 +100,15 @@ function HeroBanner() {
                   </button>
                   <button
                     type="button"
+                    onClick={() => {
+                      if (slide.ctaSecondary === 'New Arrivals') {
+                        navigate('/new-arrivals');
+                      } else if (slide.ctaSecondary === 'View Collection') {
+                        navigate('/view-collection');
+                      } else if (slide.ctaSecondary === 'Browse Coats') {
+                        navigate('/browse-coats');
+                      }
+                    }}
                     className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105 shadow-sm"
                   >
                     {slide.ctaSecondary}

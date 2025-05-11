@@ -75,7 +75,6 @@ export const makeMomoPayment = createAsyncThunk(
       const tokenFromStorage = localStorage.getItem('token') || '';
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/buyer/momoPay`,
-
         {
           momoNumber,
           orderId,
@@ -87,13 +86,12 @@ export const makeMomoPayment = createAsyncThunk(
         }
       );
       showSuccessToast('Transaction successful');
-
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || 'Payment failed';
         showErrorToast(errorMessage);
-        return rejectWithValue(error.response?.data || 'Payment failed');
+        return rejectWithValue(errorMessage);
       }
       showErrorToast('Payment failed');
       return rejectWithValue('Payment failed');

@@ -9,7 +9,7 @@ import {
 } from '@/features/Products/ProductSlice';
 import { Product } from '@/types/Product';
 import { addCartItem, removeCartItem } from '@/features/Cart/cartSlice';
-import { showSuccessToast } from '@/utils/ToastConfig';
+import { showSuccessToast, showErrorToast } from '@/utils/ToastConfig';
 
 interface ProductCardProps {
   product: Product;
@@ -21,29 +21,50 @@ function ProductCard({ product }: ProductCardProps) {
   const dispatch = useAppDispatch();
   const { token } = useAppSelector((state) => state.signIn);
   const { wishlistProducts } = useAppSelector((state) => state.products);
+  const user = useAppSelector((state) => state.signIn.user);
 
   const isInWishlist = (prod: Product, wishlistProds: Product[]) => {
     return wishlistProds?.some((wishlistProd) => wishlistProd.id === prod.id);
   };
 
   function handleAddtoCart(e: React.MouseEvent<HTMLButtonElement>) {
+    if (!token) {
+      showErrorToast('Please login to add items to cart');
+      navigate('/signin');
+      return;
+    }
+
     const element = e.target as HTMLElement;
-    const [sibling, message, action] = element.classList.contains('bg-red-600')
-      ? [
-          element.nextSibling,
-          'Product Removed From Cart',
-          dispatch(removeCartItem(cartId as number)),
-        ]
-      : [
-          element.previousSibling,
-          'Product added to cart',
-          dispatch(addCartItem({ productId: product.id, quantity: 1 })),
-        ];
-    (sibling as HTMLElement)?.style.setProperty('display', 'inline');
-    element.style.setProperty('display', 'none');
+    const isRemoving = element.classList.contains('bg-red-600');
+    
+    if (isRemoving && !cartId) {
+      showErrorToast('Invalid cart item');
+      return;
+    }
+
+    const action = isRemoving && cartId
+      ? dispatch(removeCartItem(cartId))
+      : dispatch(addCartItem({ productId: product.id, quantity: 1 }));
+
+    const sibling = isRemoving ? element.nextSibling : element.previousSibling;
+    
+    if (sibling) {
+      (sibling as HTMLElement).style.setProperty('display', 'inline');
+      element.style.setProperty('display', 'none');
+    }
+
     action.then((res) => {
-      setCartId((res.payload as Cart).id || null);
-      showSuccessToast(message);
+      if (res.meta.requestStatus === 'fulfilled') {
+        if (!isRemoving && res.payload && typeof res.payload === 'object' && 'id' in res.payload) {
+          setCartId((res.payload as Cart).id);
+          showSuccessToast('Product added to cart');
+        } else if (isRemoving) {
+          setCartId(null);
+          showSuccessToast('Product removed from cart');
+        }
+      } else if (res.meta.requestStatus === 'rejected') {
+        showErrorToast(res.payload as string || 'Operation failed');
+      }
     });
   }
   return (
@@ -82,22 +103,24 @@ function ProductCard({ product }: ProductCardProps) {
             {product.name.substring(0, 17)}
             {product.name.length > 17 && '...'}
           </button>
-          {isInWishlist(product, wishlistProducts) ? (
-            <FaHeart
-              color="#6D31ED"
-              size={20}
-              className="cursor-pointer"
-              onClick={() =>
-                dispatch(removeFromWishlist({ id: product.id, token }))
-              }
-            />
-          ) : (
-            <FaRegHeart
-              color="#9CA3AF"
-              size={20}
-              className="cursor-pointer"
-              onClick={() => dispatch(addToWishlist({ token, id: product.id }))}
-            />
+          {user?.userType.name !== 'Vendor' && (
+            isInWishlist(product, wishlistProducts) ? (
+              <FaHeart
+                color="#FFA500"
+                size={20}
+                className="cursor-pointer"
+                onClick={() =>
+                  dispatch(removeFromWishlist({ id: product.id, token }))
+                }
+              />
+            ) : (
+              <FaRegHeart
+                color="#565D6D"
+                size={20}
+                className="cursor-pointer"
+                onClick={() => dispatch(addToWishlist({ token, id: product.id }))}
+              />
+            )
           )}
         </div>
         <p className="text-gray-400 tracking-wide font-light text-sm">
@@ -195,12 +218,11 @@ function ProductCard({ product }: ProductCardProps) {
             </span>
           </div>
           <button type="button" onClick={handleAddtoCart}>
-            {' '}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
-              className="bg-red-600 text-white h-10 w-10 rounded p-2 cursor-pointer"
-              style={{ display: 'none', backgroundColor: 'red' }}
+              className="bg-red-600 text-white h-10 w-10 rounded p-2 cursor-pointer hover:bg-red-700 transition-colors duration-200"
+              style={{ display: cartId ? 'block' : 'none' }}
               id="removeFromCart"
             >
               <path
@@ -215,10 +237,10 @@ function ProductCard({ product }: ProductCardProps) {
             </svg>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="text-white h-10 w-10 rounded p-2 cursor-pointer"
+              className="bg-primary text-white h-10 w-10 rounded p-2 cursor-pointer hover:bg-thickorenge transition-colors duration-200"
               viewBox="0 0 256 256"
               data-testid="addToCart"
-              style={{ backgroundColor: '6D31ED' }}
+              style={{ display: cartId ? 'none' : 'block' }}
             >
               <path
                 fill="currentColor"

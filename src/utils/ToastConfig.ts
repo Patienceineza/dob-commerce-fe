@@ -1,43 +1,48 @@
-import { ToastContainerProps, ToastOptions, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import toast, { ToastPosition } from 'react-hot-toast';
 
-const ToastProps: ToastContainerProps = {
-  position: 'top-right',
-  autoClose: 5000,
-  hideProgressBar: false,
-  newestOnTop: false,
-  closeOnClick: true,
-  rtl: false,
-  pauseOnFocusLoss: true,
-  draggable: true,
-  pauseOnHover: true,
+const customToastOptions = {
+  duration: 3000,
+  position: 'top-center' as ToastPosition,
+  style: {
+    background: '#fff',
+    color: '#333',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+  },
 };
 
-const customToastOptionError: ToastOptions = {
-  className: 'bg-white-400 text-black p-4 rounded shadow-lg',
-  bodyClassName: 'text-sm',
+export const showSuccessToast = (message: string) => {
+  toast.success(message, {
+    ...customToastOptions,
+    style: {
+      ...customToastOptions.style,
+      background: '#f0fdf4',
+      color: '#166534',
+    },
+    icon: '✅',
+  });
 };
 
-const customToastOptionSuccess: ToastOptions = {
-  className: 'bg-white-400 text-gree p-4 rounded shadow-lg',
-  bodyClassName: 'text-sm',
+export const showErrorToast = (message: string) => {
+  toast.error(message, {
+    ...customToastOptions,
+    style: {
+      ...customToastOptions.style,
+      background: '#fef2f2',
+      color: '#991b1b',
+    },
+    icon: '❌',
+  });
 };
 
-const customToastOptionInfo: ToastOptions = {
-  className: 'bg-blue-400 text-white p-4 rounded shadow-lg',
-  bodyClassName: 'text-sm',
+export const showInfoToast = (message: string) => {
+  toast(message, {
+    ...customToastOptions,
+    style: {
+      ...customToastOptions.style,
+      background: '#eff6ff',
+      color: '#1e40af',
+    },
+    icon: 'ℹ️',
+  });
 };
-
-export const showSuccessToast = (message: string, options?: ToastOptions) => {
-  toast.success(message, { ...customToastOptionSuccess, ...options });
-};
-
-export const showErrorToast = (message: string, options?: ToastOptions) => {
-  toast.error(message, { ...customToastOptionError, ...options });
-};
-
-export const showInfoToast = (message: string, options?: ToastOptions) => {
-  toast.info(message, { ...customToastOptionInfo, ...options });
-};
-
-export default ToastProps;

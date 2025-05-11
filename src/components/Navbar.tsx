@@ -26,29 +26,30 @@ function Navbar() {
   useEffect(() => {
     dispatch(fetchCartItems());
   }, [dispatch]);
+  
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm">
-      <div className="relative flex items-center justify-between w-full h-16 px-4 md:px-8">
+    <header className="sticky top-0 z-50 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.08)] backdrop-blur-sm bg-white/95">
+      <div className="relative flex items-center justify-between w-full h-20 px-4 md:px-8 max-w-7xl mx-auto">
         {/* Mobile menu button */}
         <RxHamburgerMenu
           size={24}
-          className="lg:hidden text-gray-600 hover:text-primary transition-colors cursor-pointer"
+          className="lg:hidden text-gray-600 hover:text-primary transition-all duration-300 cursor-pointer hover:scale-110"
           onClick={() => setToggleMenu(!toggleMenu)}
         />
 
         {/* Logo/Brand */}
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-primary rounded-lg text-white">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-primary rounded-xl text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
             <FiShoppingBag size={24} />
           </div>
-          <h2 className="text-xl font-bold text-primary hidden sm:block">
+          <h2 className="text-2xl font-bold text-primary hidden sm:block tracking-tight">
             ShopEase
           </h2>
         </div>
 
         {/* Main Navigation */}
-        <nav className="hidden lg:flex items-center h-full space-x-1">
+        <nav className="hidden lg:flex items-center h-full space-x-2">
           {[
             { path: '/', name: 'Home' },
             { path: '/shop', name: 'Shop' },
@@ -58,10 +59,10 @@ function Navbar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`px-4 h-full flex items-center justify-center font-medium transition-colors ${
+              className={`px-5 h-full flex items-center justify-center font-medium transition-all duration-300 rounded-lg ${
                 location.pathname === item.path
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-gray-600 hover:text-primary'
+                  ? 'text-primary bg-primary/5 font-semibold'
+                  : 'text-gray-600 hover:text-primary hover:bg-gray-50'
               }`}
             >
               {item.name}
@@ -70,30 +71,32 @@ function Navbar() {
         </nav>
 
         {/* Right side icons */}
-        <div className="flex items-center gap-4 md:gap-6">
-          <div className="flex items-center gap-4">
-            <Link to="/cart" className="relative group">
-              <LuShoppingCart
-                size={22}
-                className="text-gray-600 group-hover:text-primary transition-colors"
+        <div className="flex items-center gap-5">
+          {user?.userType.name !== 'Vendor' && (
+            <>
+              <Link to="/cart" className="relative group">
+                <LuShoppingCart
+                  size={24}
+                  className="text-gray-600 group-hover:text-primary transition-all duration-300 group-hover:scale-110"
+                />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-primary/20">
+                    {cartItems.length}
+                  </span>
+                )}
+              </Link>
+              <FiHeart
+                size={24}
+                className="text-gray-600 hover:text-primary transition-all duration-300 cursor-pointer hover:scale-110"
+                onClick={() => navigate('/wishlist')}
               />
-              {cartItems.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartItems.length}
-                </span>
-              )}
-            </Link>
-            <FiHeart
-              size={22}
-              className="text-gray-600 hover:text-primary transition-colors cursor-pointer"
-              onClick={() => navigate('/wishlist')}
-            />
-          </div>
+            </>
+          )}
 
           {user ? (
-            <div className="hidden lg:flex items-center gap-2 relative">
+            <div className="hidden lg:flex items-center gap-3 relative">
               <div
-                className="flex items-center gap-2 cursor-pointer"
+                className="flex items-center gap-3 cursor-pointer group"
                 role="button"
                 tabIndex={0}
                 aria-expanded={toggleProfileMenu}
@@ -108,23 +111,23 @@ function Navbar() {
                 {user.picture ? (
                   <img
                     src={user.picture}
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-100 group-hover:ring-primary/20 transition-all duration-300"
                     alt="profile"
                   />
                 ) : (
-                  <FaRegUserCircle size={24} className="text-gray-600" />
+                  <FaRegUserCircle size={28} className="text-gray-600 group-hover:text-primary transition-all duration-300" />
                 )}
-                <span className="text-gray-700 font-medium">
+                <span className="text-gray-700 font-medium group-hover:text-primary transition-colors">
                   {`${user.firstName} ${user.lastName}`}
                 </span>
                 <FaAngleDown
                   size={16}
-                  className={`text-gray-500 transition-transform ${toggleProfileMenu ? 'rotate-180' : ''}`}
+                  className={`text-gray-500 transition-all duration-300 ${toggleProfileMenu ? 'rotate-180' : ''} group-hover:text-primary`}
                 />
               </div>
 
               {toggleProfileMenu && (
-                <div className="absolute top-12 right-0 bg-white shadow-lg rounded-md w-48 py-2 z-50 border border-gray-100">
+                <div className="absolute top-14 right-0 bg-white shadow-xl rounded-xl w-56 py-2 z-50 border border-gray-100">
                   {[
                     {
                       icon: <FaRegUserCircle size={16} />,
@@ -135,7 +138,7 @@ function Navbar() {
                   ].map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-primary cursor-pointer transition-colors"
                     >
                       <span className="text-gray-500">{item.icon}</span>
                       <span>{item.text}</span>
@@ -143,7 +146,7 @@ function Navbar() {
                   ))}
                   <div className="border-t border-gray-100 mt-1 pt-1">
                     <div
-                      className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-primary cursor-pointer transition-colors"
                       onClick={() => {
                         setToggleProfileMenu(false);
                         dispatch(logout());
@@ -176,7 +179,7 @@ function Navbar() {
             <HSButton
               path="/signIn"
               title="Login"
-              styles="hidden lg:flex bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors"
+              styles="hidden lg:flex bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
             />
           )}
         </div>
@@ -184,8 +187,8 @@ function Navbar() {
 
       {/* Mobile Menu */}
       {toggleMenu && (
-        <div className="lg:hidden absolute top-16 left-0 right-0 bg-white shadow-md z-40 border-t border-gray-100">
-          <div className="px-4 py-3 space-y-3">
+        <div className="lg:hidden absolute top-20 left-0 right-0 bg-white shadow-xl z-40 border-t border-gray-100">
+          <div className="px-4 py-4 space-y-2">
             {[
               { path: '/', name: 'Home' },
               { path: '/shop', name: 'Shop' },
@@ -195,10 +198,10 @@ function Navbar() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`block px-3 py-2 rounded-md ${
+                className={`block px-4 py-3 rounded-lg transition-all duration-300 ${
                   location.pathname === item.path
                     ? 'bg-primary/10 text-primary font-medium'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-primary'
                 }`}
                 onClick={() => setToggleMenu(false)}
               >
@@ -206,18 +209,18 @@ function Navbar() {
               </Link>
             ))}
           </div>
-          <div className="border-t border-gray-100 px-4 py-3">
+          <div className="border-t border-gray-100 px-4 py-4">
             {user ? (
               <>
-                <div className="flex items-center gap-3 px-3 py-2">
+                <div className="flex items-center gap-3 px-4 py-3">
                   {user.picture ? (
                     <img
                       src={user.picture}
-                      className="w-8 h-8 rounded-full object-cover"
+                      className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-100"
                       alt="profile"
                     />
                   ) : (
-                    <FaRegUserCircle size={24} className="text-gray-600" />
+                    <FaRegUserCircle size={28} className="text-gray-600" />
                   )}
                   <span className="font-medium text-gray-800">
                     {`${user.firstName} ${user.lastName}`}
@@ -225,7 +228,7 @@ function Navbar() {
                 </div>
                 <button
                   type="button"
-                  className="w-full flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary rounded-lg transition-colors"
                   onClick={() => {
                     setToggleMenu(false);
                     dispatch(logout());
@@ -253,8 +256,7 @@ function Navbar() {
               <HSButton
                 path="/signIn"
                 title="Login"
-                styles="w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md"
-                onClick={() => setToggleMenu(false)}
+                styles="w-full bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
               />
             )}
           </div>

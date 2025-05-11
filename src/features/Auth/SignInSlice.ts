@@ -92,18 +92,15 @@ const apiUrl = `${import.meta.env.VITE_BASE_URL}/user/login`;
 export const loginUser = createAsyncThunk<LoginResponse, Credentials>(
   'signIn/loginUser',
   async (credentials: Credentials, thunkAPI) => {
-    return axios
-      .post(apiUrl, credentials)
-      .then((response) => {
-        showSuccessToast(response.data.message);
-        return response.data;
-      })
-      .catch((error) => {
-        showErrorToast(error.response.data.message);
-        return thunkAPI.rejectWithValue(
-          error.response.data || 'An error occurred'
-        );
-      });
+    try {
+      const response = await axios.post(apiUrl, credentials);
+      showSuccessToast(response.data.message);
+      return response.data;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'An error occurred';
+      showErrorToast(errorMessage);
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
   }
 );
 

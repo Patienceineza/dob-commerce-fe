@@ -1,11 +1,11 @@
 import { BrowserRouter as Router } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { Toaster } from 'react-hot-toast';
 import AppRoutes from './routes/AppRoutes';
 
 function App() {
   return (
     <Router>
-      <ToastContainer />
+      <Toaster />
       <AppRoutes />
     </Router>
   );

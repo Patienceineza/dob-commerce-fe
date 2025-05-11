@@ -1,6 +1,5 @@
 import { IoClose } from 'react-icons/io5';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import Button from './form/Button';
 import { Product } from '@/types/Product';
 import { removeFromWishlist } from '@/features/Products/ProductSlice';
 
@@ -8,37 +7,41 @@ function WishlistCard({ product }: { product: Product }) {
   const { token } = useAppSelector((state) => state.signIn);
   const dispatch = useAppDispatch();
   return (
-    <div className="relative flex bg-wishlistBg xs:w-full md:w-[30rem] h-60 p-2 pb-4">
+    <div className="relative flex bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 xs:w-full md:w-[30rem] h-64 p-4 pb-6 border border-gray-100">
       <IoClose
         size={20}
-        className="absolute top-2 right-2 cursor-pointer"
+        
+        className="absolute top-3 right-3 cursor-pointer text-gray-400 hover:text-red-500 transition-colors duration-300"
         onClick={() => dispatch(removeFromWishlist({ token, id: product.id }))}
       />
       <div className="flex w-2/5">
         <img
           src={product.image}
           alt="wishlistImage"
-          className="w-full object-cover"
+          className="w-full h-full object-cover rounded-xl"
         />
       </div>
-      <div className="flex flex-col items-start gap-4 w-3/5 pl-2">
-        <h1 className="text-grey font-semibold">
+      <div className="flex flex-col items-start gap-4 w-3/5 pl-4">
+        <h1 className={`text-sm font-medium px-3 py-1 rounded-full ${
+          product.quantity > 0 
+            ? 'bg-green-100 text-green-700' 
+            : 'bg-red-100 text-red-700'
+        }`}>
           {product.quantity > 0 ? 'In Stock' : 'Out of Stock'}
         </h1>
-        <h2 className="text-grey font-normal">
-          {product.name.slice(0, 20)}
-          {product.name.length > 20 ? '...' : ''}
+        <h2 className="text-gray-800 font-semibold text-lg line-clamp-2">
+          {product.name}
         </h2>
         <div className="flex items-center font-medium gap-2 relative w-fit">
           <div className="flex items-center font-medium gap-2 relative w-fit">
-            <span className="">{product.averageRating}</span>
+            <span className="text-gray-700 font-semibold">{product.averageRating}</span>
             {Array.from({ length: Math.floor(product.averageRating) }).map(
               (_, index) => {
                 return (
                   <div data-testid="ratingStar" key={index}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 text-yellow-400"
+                      className="h-5 w-5 text-yellow-400"
                       viewBox="0 0 36 36"
                     >
                       <path
@@ -53,7 +56,7 @@ function WishlistCard({ product }: { product: Product }) {
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
+                className="h-5 w-5"
                 viewBox="0 0 36 36"
                 data-testid="halfStar"
               >
@@ -88,7 +91,7 @@ function WishlistCard({ product }: { product: Product }) {
                 <div data-testid="emptyStar" key={index}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-gray-400"
+                    className="h-5 w-5 text-gray-300"
                     viewBox="0 0 36 36"
                   >
                     <path
@@ -102,14 +105,19 @@ function WishlistCard({ product }: { product: Product }) {
           )}
         </div>
         <div className="flex gap-4 items-center">
-          <span className="text-red-700 font-bold text-lg">
+          <span className="text-red-600 font-bold text-xl">
             ${product.salesPrice}
           </span>
-          <span className="line-through text-gray-500">
+          <span className="line-through text-gray-400 text-sm">
             ${product.regularPrice}
           </span>
         </div>
-        <Button title="Add to Cart" />
+        <button 
+        title='Add to Cart'
+        className='w-full bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/20'>
+
+        </button>
+
       </div>
     </div>
   );

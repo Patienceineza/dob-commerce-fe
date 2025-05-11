@@ -53,6 +53,25 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: ['src/App.tsx'],
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          map: ['@react-jvectormap/core']
+        }
+      }
     },
+    chunkSizeWarningLimit: 1000,
+    sourcemap: false
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis'
+      }
+    }
+  },
+  esbuild: {
+    legalComments: 'none',
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  }
 });

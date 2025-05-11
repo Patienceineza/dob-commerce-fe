@@ -62,7 +62,7 @@ function ContactForm() {
       dispatch(resetStatus());
     } else if (error) {
       setErrorMessage(`Error: ${error}`);
-      setSuccessMessage(null); // Clear success message if there is an error
+      setSuccessMessage(null); 
       dispatch(resetStatus());
     }
   }, [success, error, dispatch, formik]);
@@ -75,6 +75,7 @@ function ContactForm() {
           <p className="text-4xl font-light text-black text-left mt-3">
             Get in touch today.
           </p>
+          
 
           <form
             className="flex flex-col gap-3 mt-6"

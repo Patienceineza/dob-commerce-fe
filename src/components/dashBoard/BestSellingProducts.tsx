@@ -9,13 +9,21 @@ function ProductTable() {
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_BASE_URL}/product/bestselling`, {
+      .get(`${import.meta.env.VITE_BASE_URL}/product/getAvailableProducts`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((response): void => {
-        setBestSelling(response.data.slice(0, 5));
+        console.log('Best selling products response:', response.data);
+        // Sort by averageRating to get best selling products
+        const sortedProducts = response.data.availableProducts
+          .sort((a: Product, b: Product) => b.averageRating - a.averageRating)
+          .slice(0, 5);
+        setBestSelling(sortedProducts);
+      })
+      .catch((error) => {
+        console.error('Error fetching best selling products:', error);
       });
   }, [token]);
   return (

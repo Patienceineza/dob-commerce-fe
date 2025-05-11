@@ -265,8 +265,24 @@ const AddProducts: React.FC = () => {
   };
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_BASE_URL}/category/`).then((response) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showErrorToast('Please login to add products');
+      return;
+    }
+
+    axios.get(`${import.meta.env.VITE_BASE_URL}/category/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((response) => {
       setCategory(response.data.data);
+    }).catch((error) => {
+      if (error.response?.status === 403) {
+        showErrorToast('You do not have permission to access this feature');
+      } else {
+        showErrorToast('Failed to load categories');
+      }
     });
   }, []);
 
@@ -274,18 +290,29 @@ const AddProducts: React.FC = () => {
     values: FormValues,
     { setSubmitting, resetForm }: FormikHelpers<FormValues>
   ) => {
-    const updatedValues = {
-      ...values,
-      tags,
-    };
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showErrorToast('Please login to add products');
+      setSubmitting(false);
+      return;
+    }
 
-    await dispatch(createProduct(updatedValues)).unwrap();
+    try {
+      const updatedValues = {
+        ...values,
+        tags,
+      };
 
-    setSubmitting(false);
-    resetForm();
-    setTags([]);
-    setLocalImage(null);
-    setLocalGallery([]);
+      await dispatch(createProduct(updatedValues)).unwrap();
+      setSubmitting(false);
+      resetForm();
+      setTags([]);
+      setLocalImage(null);
+      setLocalGallery([]);
+    } catch (error) {
+      setSubmitting(false);
+      // Error is already handled in the thunk
+    }
   };
 
   const initialValues: FormValues = {

@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Cart from '@/interfaces/cart';
 import { RootState } from '../../app/store';
-import { showErrorToast } from '@/utils/ToastConfig';
 
 interface CartState {
   cartItems: Cart[];
@@ -28,56 +27,72 @@ interface AddPayload {
 
 export const fetchCartItems = createAsyncThunk(
   'cart/fetchCartItems',
-  async () => {
-    const tokenFromStorage = localStorage.getItem('token') || '';
-    const response = await axios.get<Payload>(`${baseUrl}/cart`, {
-      headers: {
-        Authorization: `Bearer ${tokenFromStorage}`,
-      },
-    });
-    const res = response.data.cartItems;
-    res.reduce((acc: Cart[], curr: Cart) => {
-      const existingItem = acc.find(
-        (item) => item.product.id === curr.product.id
-      );
-      if (existingItem) {
-        existingItem.quantity += curr.quantity;
-      } else {
-        acc.push(curr);
+  async (_, { rejectWithValue }) => {
+    try {
+      const tokenFromStorage = localStorage.getItem('token');
+      if (!tokenFromStorage) {
+        return rejectWithValue('Please login to view your cart');
       }
-      return acc;
-    }, []);
-    return res;
+
+      const response = await axios.get<Payload>(`${baseUrl}/cart`, {
+        headers: {
+          Authorization: `Bearer ${tokenFromStorage}`,
+        },
+      });
+      return response.data.cartItems;
+    } catch (error) {
+      return rejectWithValue((error as any).response?.data?.message || 'Failed to fetch cart items');
+    }
   }
 );
 
 export const updateCartItemQuantity = createAsyncThunk(
   'cart/updateCartItemQuantity',
-  async ({ itemId, quantity }: { itemId: number; quantity: number }) => {
-    const tokenFromStorage = localStorage.getItem('token') || '';
-    await axios.patch<Payload>(
-      `${baseUrl}/cart/${itemId}`,
-      { quantity },
-      {
-        headers: {
-          Authorization: `Bearer ${tokenFromStorage}`,
-        },
+  async ({ itemId, quantity }: { itemId: number; quantity: number }, { rejectWithValue }) => {
+    try {
+      const tokenFromStorage = localStorage.getItem('token');
+      if (!tokenFromStorage) {
+        return rejectWithValue('Please login to update cart');
       }
-    );
-    return { itemId, quantity };
+
+      await axios.patch<Payload>(
+        `${baseUrl}/cart/${itemId}`,
+        { quantity },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenFromStorage}`,
+          },
+        }
+      );
+      return { itemId, quantity };
+    } catch (error) {
+      return rejectWithValue((error as any).response?.data?.message || 'Failed to update cart item');
+    }
   }
 );
 
 export const removeCartItem = createAsyncThunk(
   'cart/removeCartItem',
-  async (itemId: number) => {
-    const tokenFromStorage = localStorage.getItem('token') || '';
-    await axios.delete(`${baseUrl}/cart/${itemId}`, {
-      headers: {
-        Authorization: `Bearer ${tokenFromStorage}`,
-      },
-    });
-    return itemId;
+  async (itemId: number, { rejectWithValue }) => {
+    try {
+      if (!itemId) {
+        return rejectWithValue('Invalid cart item');
+      }
+
+      const tokenFromStorage = localStorage.getItem('token');
+      if (!tokenFromStorage) {
+        return rejectWithValue('Please login to remove items from cart');
+      }
+
+      await axios.delete(`${baseUrl}/cart/${itemId}`, {
+        headers: {
+          Authorization: `Bearer ${tokenFromStorage}`,
+        },
+      });
+      return itemId;
+    } catch (error) {
+      return rejectWithValue((error as any).response?.data?.message || 'Failed to remove cart item');
+    }
   }
 );
 
@@ -88,7 +103,11 @@ export const addCartItem = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const tokenFromStorage = localStorage.getItem('token') || '';
+      const tokenFromStorage = localStorage.getItem('token');
+      if (!tokenFromStorage) {
+        return rejectWithValue('Please login to add items to cart');
+      }
+
       const response = await axios.post<AddPayload>(
         `${baseUrl}/cart`,
         { productId, quantity },
@@ -100,8 +119,7 @@ export const addCartItem = createAsyncThunk(
       );
       return response.data.cartItem;
     } catch (error) {
-      showErrorToast('Failed to add cart item');
-      return rejectWithValue((error as any).response.data);
+      return rejectWithValue((error as any).response?.data?.message || 'Failed to add cart item');
     }
   }
 );

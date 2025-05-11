@@ -13,6 +13,9 @@ import Admin from '@/pages/Admin';
 import DesplayProductPage from '@/pages/DesplayProductPage';
 import EditProductPage from '@/pages/EditPage';
 import Shop from '@/pages/Shop';
+import NewArrivals from '@/pages/NewArrivals';
+import ViewCollection from '@/pages/ViewCollection';
+import BrowseCoats from '@/pages/BrowseCoats';
 import ContactPage from '@/pages/contact';
 import Wishlist from '@/pages/Wishlist';
 import Orders from '@/pages/Orders';
@@ -29,6 +32,8 @@ import EditCoupon from '@/pages/EditCoupon';
 import TableUserRole from '@/components/dashBoard/UserRole';
 import Customer from '@/pages/customer';
 import Category from '@/components/dashBoard/Category';
+import CategoryProducts from '@/pages/CategoryProducts';
+import EmailConfirmation from '@/pages/EmailConfirmation';
 
 function AppRoutes() {
   return (
@@ -36,8 +41,12 @@ function AppRoutes() {
       <Route element={<HomeLayout />}>
         <Route index path="/" element={<Home />} />
         <Route path="shop" element={<Shop />} />
+        <Route path="new-arrivals" element={<NewArrivals />} />
+        <Route path="view-collection" element={<ViewCollection />} />
+        <Route path="browse-coats" element={<BrowseCoats />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="about" element={<Aboutus />} />
+        <Route path="category/:categoryId" element={<CategoryProducts />} />
         <Route
           path="wishlist"
           element={
@@ -69,6 +78,7 @@ function AppRoutes() {
       <Route path="/verify-2fa/:id/:email" element={<TwoFactorAuthForm />} />
       <Route path="/forgot-password" element={<PasswordResetRequestForm />} />
       <Route path="/reset-password/:token" element={<ResetPasswordForm />} />
+      <Route path="/confirm" element={<EmailConfirmation />} />
 
       <Route
         path="/dashboard"
@@ -100,8 +110,6 @@ function AppRoutes() {
         <Route index path="/dashboard/userRole/" element={<TableUserRole />} />
       </Route>
       <Route path="*" element={<ErrorPage />} />
-      <Route path="/forgot-password" element={<PasswordResetRequestForm />} />
-      <Route path="/reset-password/:token" element={<ResetPasswordForm />} />
     </Routes>
   );
 }
