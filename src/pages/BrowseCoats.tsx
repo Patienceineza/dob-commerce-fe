@@ -7,16 +7,19 @@ import { Product } from '@/types/Product';
 
 function BrowseCoats() {
   const dispatch: AppDispatch = useDispatch();
-  const { products, isLoading } = useSelector((state: RootState) => state.products);
+  const { products, isLoading } = useSelector(
+    (state: RootState) => state.products
+  );
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
   // Filter products in the coats category
-  const coatProducts = products.filter((product: Product) => 
-    product.category.name.toLowerCase().includes('coat') ||
-    product.name.toLowerCase().includes('coat')
+  const coatProducts = products.filter(
+    (product: Product) =>
+      product.category.name.toLowerCase().includes('coat') ||
+      product.name.toLowerCase().includes('coat')
   );
 
   if (isLoading) {
@@ -39,4 +42,4 @@ function BrowseCoats() {
   );
 }
 
-export default BrowseCoats; 
+export default BrowseCoats;

@@ -56,22 +56,22 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          map: ['@react-jvectormap/core']
-        }
-      }
+          map: ['@react-jvectormap/core'],
+        },
+      },
     },
     chunkSizeWarningLimit: 1000,
-    sourcemap: false
+    sourcemap: false,
   },
   optimizeDeps: {
     esbuildOptions: {
       define: {
-        global: 'globalThis'
-      }
-    }
+        global: 'globalThis',
+      },
+    },
   },
   esbuild: {
     legalComments: 'none',
-    logOverride: { 'this-is-undefined-in-esm': 'silent' }
-  }
+    logOverride: { 'this-is-undefined-in-esm': 'silent' },
+  },
 });

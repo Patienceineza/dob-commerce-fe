@@ -62,7 +62,7 @@ function ContactForm() {
       dispatch(resetStatus());
     } else if (error) {
       setErrorMessage(`Error: ${error}`);
-      setSuccessMessage(null); 
+      setSuccessMessage(null);
       dispatch(resetStatus());
     }
   }, [success, error, dispatch, formik]);
@@ -75,7 +75,6 @@ function ContactForm() {
           <p className="text-4xl font-light text-black text-left mt-3">
             Get in touch today.
           </p>
-          
 
           <form
             className="flex flex-col gap-3 mt-6"
@@ -203,8 +202,7 @@ function ContactForm() {
                 Rwanda
               </li>
               <li className="flex flex-row gap-8 font-light text-base my-5">
-                <FaEnvelope className="text-violet-700 w-6" />{' '}
-                info@DOBshop.rw
+                <FaEnvelope className="text-violet-700 w-6" /> info@DOBshop.rw
               </li>
               <li className="flex flex-row gap-8 font-light text-base">
                 <PhoneIcon className="text-violet-700 w-6" /> +250 782 222 000

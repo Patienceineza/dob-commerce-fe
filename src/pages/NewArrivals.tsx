@@ -7,7 +7,9 @@ import { Product } from '@/types/Product';
 
 function NewArrivals() {
   const dispatch: AppDispatch = useDispatch();
-  const { products, isLoading } = useSelector((state: RootState) => state.products);
+  const { products, isLoading } = useSelector(
+    (state: RootState) => state.products
+  );
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -36,4 +38,4 @@ function NewArrivals() {
   );
 }
 
-export default NewArrivals; 
+export default NewArrivals;

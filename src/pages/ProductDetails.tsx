@@ -213,9 +213,11 @@ function ProductDetails() {
   const handleCheckout = () => {
     // First add to cart if not already in cart
     if (!cartId) {
-      dispatch(addCartItem({ productId: product!.id, quantity: 1 })).then(() => {
-        navigate('/checkout');
-      });
+      dispatch(addCartItem({ productId: product!.id, quantity: 1 })).then(
+        () => {
+          navigate('/checkout');
+        }
+      );
     } else {
       navigate('/checkout');
     }
@@ -554,7 +556,9 @@ function ProductDetails() {
                         <button
                           key={star}
                           type="button"
-                          onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                          onClick={() =>
+                            setReviewForm({ ...reviewForm, rating: star })
+                          }
                           className="focus:outline-none"
                         >
                           <svg
@@ -577,7 +581,9 @@ function ProductDetails() {
                   </div>
                   <textarea
                     value={reviewForm.content}
-                    onChange={(e) => setReviewForm({ ...reviewForm, content: e.target.value })}
+                    onChange={(e) =>
+                      setReviewForm({ ...reviewForm, content: e.target.value })
+                    }
                     placeholder="Write your review here..."
                     className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                     rows={4}
@@ -586,19 +592,27 @@ function ProductDetails() {
                     type="button"
                     onClick={async () => {
                       if (!reviewForm.rating || !reviewForm.content) {
-                        showSuccessToast('Please provide both rating and review content');
+                        showSuccessToast(
+                          'Please provide both rating and review content'
+                        );
                         return;
                       }
                       try {
-                        await dispatch(submitReview({
-                          content: reviewForm.content,
-                          rating: reviewForm.rating,
-                          productId: product!.id,
-                          token,
-                        })).unwrap();
+                        await dispatch(
+                          submitReview({
+                            content: reviewForm.content,
+                            rating: reviewForm.rating,
+                            productId: product!.id,
+                            token,
+                          })
+                        ).unwrap();
                         showSuccessToast('Review submitted successfully!');
-                        setReviewForm({ rating: null, content: '', productId: product?.id });
-                        setNewReview(prev => !prev);
+                        setReviewForm({
+                          rating: null,
+                          content: '',
+                          productId: product?.id,
+                        });
+                        setNewReview((prev) => !prev);
                       } catch (error) {
                         showSuccessToast(error as string);
                       }

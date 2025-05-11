@@ -36,18 +36,19 @@ function ProductCard({ product }: ProductCardProps) {
 
     const element = e.target as HTMLElement;
     const isRemoving = element.classList.contains('bg-red-600');
-    
+
     if (isRemoving && !cartId) {
       showErrorToast('Invalid cart item');
       return;
     }
 
-    const action = isRemoving && cartId
-      ? dispatch(removeCartItem(cartId))
-      : dispatch(addCartItem({ productId: product.id, quantity: 1 }));
+    const action =
+      isRemoving && cartId
+        ? dispatch(removeCartItem(cartId))
+        : dispatch(addCartItem({ productId: product.id, quantity: 1 }));
 
     const sibling = isRemoving ? element.nextSibling : element.previousSibling;
-    
+
     if (sibling) {
       (sibling as HTMLElement).style.setProperty('display', 'inline');
       element.style.setProperty('display', 'none');
@@ -55,7 +56,12 @@ function ProductCard({ product }: ProductCardProps) {
 
     action.then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        if (!isRemoving && res.payload && typeof res.payload === 'object' && 'id' in res.payload) {
+        if (
+          !isRemoving &&
+          res.payload &&
+          typeof res.payload === 'object' &&
+          'id' in res.payload
+        ) {
           setCartId((res.payload as Cart).id);
           showSuccessToast('Product added to cart');
         } else if (isRemoving) {
@@ -63,7 +69,7 @@ function ProductCard({ product }: ProductCardProps) {
           showSuccessToast('Product removed from cart');
         }
       } else if (res.meta.requestStatus === 'rejected') {
-        showErrorToast(res.payload as string || 'Operation failed');
+        showErrorToast((res.payload as string) || 'Operation failed');
       }
     });
   }
@@ -103,8 +109,8 @@ function ProductCard({ product }: ProductCardProps) {
             {product.name.substring(0, 17)}
             {product.name.length > 17 && '...'}
           </button>
-          {user?.userType.name !== 'Vendor' && (
-            isInWishlist(product, wishlistProducts) ? (
+          {user?.userType.name !== 'Vendor' &&
+            (isInWishlist(product, wishlistProducts) ? (
               <FaHeart
                 color="#FFA500"
                 size={20}
@@ -118,10 +124,11 @@ function ProductCard({ product }: ProductCardProps) {
                 color="#565D6D"
                 size={20}
                 className="cursor-pointer"
-                onClick={() => dispatch(addToWishlist({ token, id: product.id }))}
+                onClick={() =>
+                  dispatch(addToWishlist({ token, id: product.id }))
+                }
               />
-            )
-          )}
+            ))}
         </div>
         <p className="text-gray-400 tracking-wide font-light text-sm">
           {product.shortDesc.substring(0, 27)}

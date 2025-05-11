@@ -41,14 +41,19 @@ export const fetchCartItems = createAsyncThunk(
       });
       return response.data.cartItems;
     } catch (error) {
-      return rejectWithValue((error as any).response?.data?.message || 'Failed to fetch cart items');
+      return rejectWithValue(
+        (error as any).response?.data?.message || 'Failed to fetch cart items'
+      );
     }
   }
 );
 
 export const updateCartItemQuantity = createAsyncThunk(
   'cart/updateCartItemQuantity',
-  async ({ itemId, quantity }: { itemId: number; quantity: number }, { rejectWithValue }) => {
+  async (
+    { itemId, quantity }: { itemId: number; quantity: number },
+    { rejectWithValue }
+  ) => {
     try {
       const tokenFromStorage = localStorage.getItem('token');
       if (!tokenFromStorage) {
@@ -66,7 +71,9 @@ export const updateCartItemQuantity = createAsyncThunk(
       );
       return { itemId, quantity };
     } catch (error) {
-      return rejectWithValue((error as any).response?.data?.message || 'Failed to update cart item');
+      return rejectWithValue(
+        (error as any).response?.data?.message || 'Failed to update cart item'
+      );
     }
   }
 );
@@ -91,7 +98,9 @@ export const removeCartItem = createAsyncThunk(
       });
       return itemId;
     } catch (error) {
-      return rejectWithValue((error as any).response?.data?.message || 'Failed to remove cart item');
+      return rejectWithValue(
+        (error as any).response?.data?.message || 'Failed to remove cart item'
+      );
     }
   }
 );
@@ -119,7 +128,9 @@ export const addCartItem = createAsyncThunk(
       );
       return response.data.cartItem;
     } catch (error) {
-      return rejectWithValue((error as any).response?.data?.message || 'Failed to add cart item');
+      return rejectWithValue(
+        (error as any).response?.data?.message || 'Failed to add cart item'
+      );
     }
   }
 );

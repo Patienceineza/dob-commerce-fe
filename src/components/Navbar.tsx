@@ -26,7 +26,6 @@ function Navbar() {
   useEffect(() => {
     dispatch(fetchCartItems());
   }, [dispatch]);
-  
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.08)] backdrop-blur-sm bg-white/95">
@@ -115,7 +114,10 @@ function Navbar() {
                     alt="profile"
                   />
                 ) : (
-                  <FaRegUserCircle size={28} className="text-gray-600 group-hover:text-primary transition-all duration-300" />
+                  <FaRegUserCircle
+                    size={28}
+                    className="text-gray-600 group-hover:text-primary transition-all duration-300"
+                  />
                 )}
                 <span className="text-gray-700 font-medium group-hover:text-primary transition-colors">
                   {`${user.firstName} ${user.lastName}`}

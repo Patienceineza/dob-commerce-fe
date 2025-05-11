@@ -9,7 +9,9 @@ function EmailConfirmation() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading'
+  );
   const [message, setMessage] = useState('');
   const token = searchParams.get('token');
 
@@ -27,7 +29,7 @@ function EmailConfirmation() {
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/user/confirm?token=${token}`
         );
-        
+
         if (response.data.success) {
           setStatus('success');
           setMessage('Email confirmed successfully!');
@@ -36,7 +38,8 @@ function EmailConfirmation() {
         }
       } catch (error: any) {
         setStatus('error');
-        const errorMessage = error.response?.data?.message || 'Failed to confirm email';
+        const errorMessage =
+          error.response?.data?.message || 'Failed to confirm email';
         setMessage(errorMessage);
         showErrorToast(errorMessage);
         setTimeout(() => navigate('/signin'), 3000);
@@ -73,7 +76,9 @@ function EmailConfirmation() {
       return (
         <div className="flex flex-col items-center gap-4">
           <FaTimesCircle className="text-red-500 text-5xl" />
-          <h2 className="text-2xl font-bold text-gray-800">Confirmation Failed</h2>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Confirmation Failed
+          </h2>
           <p className="text-gray-600">{message}</p>
           <p className="text-sm text-gray-500">Redirecting to login page...</p>
         </div>
@@ -100,4 +105,4 @@ function EmailConfirmation() {
   );
 }
 
-export default EmailConfirmation; 
+export default EmailConfirmation;

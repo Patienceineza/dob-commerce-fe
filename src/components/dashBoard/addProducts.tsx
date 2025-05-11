@@ -271,19 +271,22 @@ const AddProducts: React.FC = () => {
       return;
     }
 
-    axios.get(`${import.meta.env.VITE_BASE_URL}/category/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((response) => {
-      setCategory(response.data.data);
-    }).catch((error) => {
-      if (error.response?.status === 403) {
-        showErrorToast('You do not have permission to access this feature');
-      } else {
-        showErrorToast('Failed to load categories');
-      }
-    });
+    axios
+      .get(`${import.meta.env.VITE_BASE_URL}/category/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setCategory(response.data.data);
+      })
+      .catch((error) => {
+        if (error.response?.status === 403) {
+          showErrorToast('You do not have permission to access this feature');
+        } else {
+          showErrorToast('Failed to load categories');
+        }
+      });
   }, []);
 
   const handleSubmit = async (

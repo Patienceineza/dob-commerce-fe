@@ -6,7 +6,9 @@ import BannerAd from '@/components/bannerAds/bannerAds';
 
 function BannerSection() {
   const dispatch: AppDispatch = useDispatch();
-  const { items: banners, status } = useSelector((state: RootState) => state.banners);
+  const { items: banners, status } = useSelector(
+    (state: RootState) => state.banners
+  );
 
   useEffect(() => {
     if (status === 'idle') {

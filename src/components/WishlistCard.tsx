@@ -10,7 +10,6 @@ function WishlistCard({ product }: { product: Product }) {
     <div className="relative flex bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 xs:w-full md:w-[30rem] h-64 p-4 pb-6 border border-gray-100">
       <IoClose
         size={20}
-        
         className="absolute top-3 right-3 cursor-pointer text-gray-400 hover:text-red-500 transition-colors duration-300"
         onClick={() => dispatch(removeFromWishlist({ token, id: product.id }))}
       />
@@ -22,11 +21,13 @@ function WishlistCard({ product }: { product: Product }) {
         />
       </div>
       <div className="flex flex-col items-start gap-4 w-3/5 pl-4">
-        <h1 className={`text-sm font-medium px-3 py-1 rounded-full ${
-          product.quantity > 0 
-            ? 'bg-green-100 text-green-700' 
-            : 'bg-red-100 text-red-700'
-        }`}>
+        <h1
+          className={`text-sm font-medium px-3 py-1 rounded-full ${
+            product.quantity > 0
+              ? 'bg-green-100 text-green-700'
+              : 'bg-red-100 text-red-700'
+          }`}
+        >
           {product.quantity > 0 ? 'In Stock' : 'Out of Stock'}
         </h1>
         <h2 className="text-gray-800 font-semibold text-lg line-clamp-2">
@@ -34,7 +35,9 @@ function WishlistCard({ product }: { product: Product }) {
         </h2>
         <div className="flex items-center font-medium gap-2 relative w-fit">
           <div className="flex items-center font-medium gap-2 relative w-fit">
-            <span className="text-gray-700 font-semibold">{product.averageRating}</span>
+            <span className="text-gray-700 font-semibold">
+              {product.averageRating}
+            </span>
             {Array.from({ length: Math.floor(product.averageRating) }).map(
               (_, index) => {
                 return (
@@ -112,12 +115,10 @@ function WishlistCard({ product }: { product: Product }) {
             ${product.regularPrice}
           </span>
         </div>
-        <button 
-        title='Add to Cart'
-        className='w-full bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/20'>
-
-        </button>
-
+        <button
+          title="Add to Cart"
+          className="w-full bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
+        ></button>
       </div>
     </div>
   );

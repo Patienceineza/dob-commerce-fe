@@ -10,7 +10,6 @@ import signInReducer from '@/features/Auth/SignInSlice';
 import cartReducer from '@/features/Cart/cartSlice';
 
 const createTestStore = () =>
-
   configureStore({
     reducer: { signIn: signInReducer, cartItems: cartReducer },
   });

@@ -7,13 +7,17 @@ import { Product } from '@/types/Product';
 
 function ViewCollection() {
   const dispatch: AppDispatch = useDispatch();
-  const { products, isLoading } = useSelector((state: RootState) => state.products);
+  const { products, isLoading } = useSelector(
+    (state: RootState) => state.products
+  );
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  const featuredProducts = products.filter((product: Product) => product.isFeatured);
+  const featuredProducts = products.filter(
+    (product: Product) => product.isFeatured
+  );
 
   if (isLoading) {
     return (
@@ -35,4 +39,4 @@ function ViewCollection() {
   );
 }
 
-export default ViewCollection; 
+export default ViewCollection;

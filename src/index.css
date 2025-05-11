@@ -9,12 +9,17 @@
 /* PriceRangeSlider.css */
 
 @keyframes progress {
-  from { width: 0%; }
-  to { width: 100%; }
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 /* Smooth transitions for all interactive elements */
-button, .transition-all {
+button,
+.transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 300ms;

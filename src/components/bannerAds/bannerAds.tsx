@@ -9,7 +9,13 @@ interface MyBannerAdsProps {
   productId: number;
 }
 
-function BannerAd({ s_title, title, description, image, productId }: MyBannerAdsProps) {
+function BannerAd({
+  s_title,
+  title,
+  description,
+  image,
+  productId,
+}: MyBannerAdsProps) {
   const navigate = useNavigate();
 
   const handleShopNow = () => {

@@ -30,7 +30,9 @@ function Footer() {
         if (submitForm.fulfilled.match(result)) {
           showSuccessToast('Subscription successful!');
         } else {
-          showErrorToast('Subscription failed. Please try again with another email.');
+          showErrorToast(
+            'Subscription failed. Please try again with another email.'
+          );
         }
       })
       .catch(() => {

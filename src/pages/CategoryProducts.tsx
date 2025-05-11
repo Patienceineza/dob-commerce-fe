@@ -13,9 +13,15 @@ function CategoryProducts() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [categoryName, setCategoryName] = useState('');
-  const products = useAppSelector((state: RootState) => state.products.products);
-  const categories = useAppSelector((state: RootState) => state.categories.categories);
-  const isLoading = useAppSelector((state: RootState) => state.products.isLoading);
+  const products = useAppSelector(
+    (state: RootState) => state.products.products
+  );
+  const categories = useAppSelector(
+    (state: RootState) => state.categories.categories
+  );
+  const isLoading = useAppSelector(
+    (state: RootState) => state.products.isLoading
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,7 +30,7 @@ function CategoryProducts() {
         // Fetch both products and categories
         await Promise.all([
           dispatch(fetchProducts()).unwrap(),
-          dispatch(fetchCategories()).unwrap()
+          dispatch(fetchCategories()).unwrap(),
         ]);
       } catch (err) {
         setError('Failed to load products. Please try again later.');
@@ -35,7 +41,7 @@ function CategoryProducts() {
 
   useEffect(() => {
     // Set category name when categories are loaded
-    const category = categories.find(cat => cat.id === Number(categoryId));
+    const category = categories.find((cat) => cat.id === Number(categoryId));
     if (category) {
       setCategoryName(category.name);
     }
@@ -49,7 +55,9 @@ function CategoryProducts() {
   // Filter products by category
   const filteredProducts = products.filter((product: Product) => {
     // Check if the product's category name matches any category with the given ID
-    const matchingCategory = categories.find(cat => cat.id === Number(categoryId));
+    const matchingCategory = categories.find(
+      (cat) => cat.id === Number(categoryId)
+    );
     return matchingCategory && product.category?.name === matchingCategory.name;
   });
 
@@ -95,13 +103,15 @@ function CategoryProducts() {
       {/* Products Grid */}
       {filteredProducts.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No products found in this category.</p>
+          <p className="text-gray-500 text-lg">
+            No products found in this category.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <div 
-              key={product.id} 
+            <div
+              key={product.id}
               onClick={() => handleProductClick(product.id)}
               className="cursor-pointer transition-transform hover:scale-105"
             >
@@ -114,4 +124,4 @@ function CategoryProducts() {
   );
 }
 
-export default CategoryProducts; 
+export default CategoryProducts;

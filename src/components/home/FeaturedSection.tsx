@@ -4,7 +4,10 @@ import ProductCard from './ProductCard';
 import { RootState } from '@/app/store';
 import { Product } from '@/types/Product';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { selectProducts, fetchProducts } from '@/features/Products/ProductSlice';
+import {
+  selectProducts,
+  fetchProducts,
+} from '@/features/Products/ProductSlice';
 import { useEffect } from 'react';
 
 function FeaturedSection() {
@@ -16,9 +19,7 @@ function FeaturedSection() {
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
-  const latestProducts = [...products]
-    .sort((a, b) => b.id - a.id)
-    .slice(0, 4);
+  const latestProducts = [...products].sort((a, b) => b.id - a.id).slice(0, 4);
 
   return (
     <div className="w-full mx-auto mt-8 md:mt-12 px-16">

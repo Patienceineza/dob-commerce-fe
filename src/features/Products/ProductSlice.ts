@@ -184,28 +184,33 @@ export const removeFromWishlist = createAsyncThunk<
 export const submitReview = createAsyncThunk<
   { message: string; review: any },
   { content: string; rating: number; productId: number; token: string | null }
->('products/submitReview', async ({ content, rating, productId, token }, thunkAPI) => {
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/review`,
-      { content, rating, productId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+>(
+  'products/submitReview',
+  async ({ content, rating, productId, token }, thunkAPI) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/review`,
+        { content, rating, productId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      if (error.response) {
+        return thunkAPI.rejectWithValue(
+          (error.response.data as { message: string }).message
+        );
       }
-    );
-    return response.data;
-  } catch (err) {
-    const error = err as AxiosError;
-    if (error.response) {
       return thunkAPI.rejectWithValue(
-        (error.response.data as { message: string }).message
+        'An error occurred while submitting review'
       );
     }
-    return thunkAPI.rejectWithValue('An error occurred while submitting review');
   }
-});
+);
 
 interface ProductsState {
   isLoading: boolean;
@@ -372,10 +377,18 @@ const productsSlice = createSlice({
       .addCase(submitReview.fulfilled, (state, action) => {
         state.productDetailsLoading = false;
         if (state.productDetails) {
-          state.productDetails.reviews = [...state.productDetails.reviews, action.payload.review];
+          state.productDetails.reviews = [
+            ...state.productDetails.reviews,
+            action.payload.review,
+          ];
           // Update average rating
-          const totalRating = state.productDetails.reviews.reduce((sum, review) => sum + review.rating, 0);
-          state.productDetails.averageRating = Number((totalRating / state.productDetails.reviews.length).toPrecision(2));
+          const totalRating = state.productDetails.reviews.reduce(
+            (sum, review) => sum + review.rating,
+            0
+          );
+          state.productDetails.averageRating = Number(
+            (totalRating / state.productDetails.reviews.length).toPrecision(2)
+          );
         }
       })
       .addCase(submitReview.rejected, (state) => {
